@@ -1,0 +1,13 @@
+type Link {
+  id: Int
+  long_link: String!
+  short_link: String!
+}
+
+type Query {
+  getLinks: [Link!]!
+}
+
+type Mutation {
+  addLink: Link!
+}

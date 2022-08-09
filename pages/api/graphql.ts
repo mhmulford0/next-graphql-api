@@ -1,45 +1,29 @@
 import { createServer } from "@graphql-yoga/node";
 import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
+import { readFileSync } from "node:fs";
 
 const prisma = new PrismaClient();
 
-const typeDefs = /* GraphQL */`
-  type Query {
-    users: [User!]!
-    others: [Other!]!
-  }
-  type User {
-    name: String
-  }
-  type Other {
-    data: String
-  }
-
-  type Mutation {
-    others: String
-  }
-`;
+const typeDefs = readFileSync("./schema.graphql", "utf8");
 
 const resolvers = {
   Query: {
-    users() {
-      return [{ name: "Nextjs" }];
-    },
-    async others() {
+    async getLinks() {
       const links = await prisma.link.findMany();
       console.log(links);
-      return [{ data: "more stuff" }];
+      return [...links];
     },
   },
   Mutation: {
-    async others() {
-      await prisma.link.create({
+    async addLink() {
+      const link = await prisma.link.create({
         data: {
           long_link: "https://google.com",
-          short_link: "https://google.com1",
+          short_link: "https://google.com1" + Math.random(),
         },
       });
+      return link;
     },
   },
 };
